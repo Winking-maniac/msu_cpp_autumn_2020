@@ -387,6 +387,18 @@ int assign_tests(bool silent) {
     return res;
 }
 
+int col_test(bool silent) {
+    Array x(std::vector<unsigned>(2, 3));
+    if (x.cols() != 3) return 1;
+    return 0;
+}
+
+int row_test(bool silent) {
+    Array x(std::vector<unsigned>(2, 3));
+    if (x.rows() != 3) return 1;
+    return 0;
+}
+
 int main(int argc, char **argv) {
     bool silent = false;
     if (argc > 1) {
@@ -398,6 +410,9 @@ int main(int argc, char **argv) {
     res += math_tests(silent);
     res += index_tests(silent);
     res += print_test(silent);
+    res += row_test(silent);
+    res += col_test(silent);
+    
     if (res) {
         std::cout << res << " tests failed" << std::endl;
     } else {
