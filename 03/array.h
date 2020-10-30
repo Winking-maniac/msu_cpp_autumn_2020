@@ -7,7 +7,7 @@ class Array
     public:
         Array();                                        //done
         Array(std::vector<unsigned> shape);             //done
-        Array(const Array& x);                          //done
+        //Array(const Array& x);                          //done
         Array& operator=(const int x);                  //done
         Array& operator=(const Array& x);               //done
         std::vector<unsigned> get_shape();              //done
