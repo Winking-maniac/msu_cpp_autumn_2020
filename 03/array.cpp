@@ -22,7 +22,7 @@ Array& Array::operator*=(const int x) {
             next() *= x;
         }
     }
-    catch(std::out_of_range err) 
+    catch(const std::out_of_range &err) 
     {
         return *this;
     }
@@ -45,7 +45,7 @@ Array& Array::operator+=(const Array& x) {
             next() += x.next();
         }
     }
-    catch(std::out_of_range err) 
+    catch(const std::out_of_range &err) 
     {
         return *this;
     }
@@ -68,7 +68,7 @@ Array& Array::operator-=(const Array& x) {
             next() -= x.next();
         }
     }
-    catch(std::out_of_range err) 
+    catch(const std::out_of_range &err) 
     {
         return *this;
     }
@@ -82,7 +82,7 @@ Array& Array::operator+=(const int x) {
             next() += x;
         }
     }
-    catch(std::out_of_range err) 
+    catch(const std::out_of_range &err) 
     {
         return *this;
     }
@@ -96,45 +96,45 @@ Array& Array::operator-=(const int x) {
             next() -= x;
         }
     }
-    catch(std::out_of_range err) 
+    catch(const std::out_of_range &err) 
     {
         return *this;
     }
 }
 
-Array& Array::operator+(const int x) const{
+Array Array::operator+(const int x) const{
     Array *res = &deep_copy();
     return *res += x;
 }
 
-Array& Array::operator-(const int x) const{
+Array Array::operator-(const int x) const{
     Array *res = &deep_copy();
     return *res -= x;
 }
 
-Array& Array::operator*(const int x) const{
+Array Array::operator*(const int x) const{
     Array *res = &deep_copy();
     return *res *= x;
 }
 
-Array& operator+(const int x, const Array& y) {
+Array operator+(const int x, const Array& y) {
     return y+x;
 }
 
-Array& operator-(const int x, const Array& y) {
+Array operator-(const int x, const Array& y) {
     return (y-x) *= -1;
 }
 
-Array& operator*(const int x, const Array& y) {
+Array operator*(const int x, const Array& y) {
     return y*x;
 }
 
-Array& Array::operator+(const Array& x) const{
+Array Array::operator+(const Array& x) const{
     Array *res = &deep_copy();
     return *res += x;
 }
 
-Array& Array::operator-(const Array& x) const{
+Array Array::operator-(const Array& x) const{
     Array *res = &deep_copy();
     return *res -= x;
 }
@@ -161,7 +161,7 @@ bool Array::operator==(const Array& x) const{
             }
         }
     }
-    catch(std::out_of_range err) 
+    catch(const std::out_of_range &err) 
     {
         return true;
     }
@@ -232,7 +232,7 @@ Array& Array::deep_copy() const{
             res->next() = next();
         }
     }
-    catch (std::out_of_range err) {
+    catch (const std::out_of_range &err) {
         // std::cout << "ok" << std::endl;
         // fflush(stdout);
     
@@ -342,7 +342,7 @@ Array& Array::operator=(const Array& x) {
                 next() = x.next();
             }
         }
-        catch(std::out_of_range err) 
+        catch(const std::out_of_range &err) 
         {
             return *this;
         }
@@ -356,14 +356,12 @@ unsigned Array::rows() const{
     return shape[0];
 }
 
-
 unsigned Array::cols() const{
     if (dim < 2) {
         throw std::logic_error("Array is zero or one -dimensional");
     }
     return shape[1];
 }
-
 
 unsigned Array::slices() const{
     if (dim < 3) {

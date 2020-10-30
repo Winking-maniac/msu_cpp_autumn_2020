@@ -7,7 +7,7 @@ class Array
     public:
         Array();                                        //done
         Array(std::vector<unsigned> shape);             //done
-        // Array(const Array& x);                          //done
+        Array(const Array& x);                          //done
         Array& operator=(const int x);                  //done
         Array& operator=(const Array& x);               //done
         std::vector<unsigned> get_shape();              //done
@@ -17,14 +17,14 @@ class Array
         Array& operator-=(const Array& x);              //done
         Array& operator+=(const int x);                 //done
         Array& operator+=(const Array& x);              //done
-        Array& operator+(const Array& x) const;         //done
-        Array& operator+(const int x) const;            //done
-        friend Array& operator+(const int x, const Array& y);  //done
-        Array& operator-(const Array& x) const;         //done
-        Array& operator-(const int x) const;            //done
-        friend Array& operator-(const int x, const Array& y);  //done
-        Array& operator*(const int x) const;            //done
-        friend Array& operator*(const int x, const Array& y);  //done
+        Array operator+(const Array& x) const;         //done
+        Array operator+(const int x) const;            //done
+        friend Array operator+(const int x, const Array& y);  //done
+        Array operator-(const Array& x) const;         //done
+        Array operator-(const int x) const;            //done
+        friend Array operator-(const int x, const Array& y);  //done
+        Array operator*(const int x) const;            //done
+        friend Array operator*(const int x, const Array& y);  //done
         Array& operator[](int index) const;                   //done
         explicit operator int();                                 //done
         bool operator==(const Array& x) const;          //done

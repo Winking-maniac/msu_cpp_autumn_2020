@@ -8,7 +8,7 @@ int default_init_test() {
     try {
         Array x;
     }
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;
     }
     return 0;
@@ -18,7 +18,7 @@ int init_test() {
     try {
         Array(std::vector<unsigned>(5, 4));
     }
-    catch (std::exception err) {
+    catch (const std::exception &err) {
         return 1;
     }
     return 0;
@@ -30,7 +30,7 @@ int view_test() {
     try {
         y = x;
     } 
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;    
     }
     
@@ -42,7 +42,7 @@ int view_test() {
         // std::cout << "ok\n";
 
     }
-    catch (std::logic_error err) {
+    catch (const std::logic_error &err) {
         return 1;
     }/*
     catch (std::exception err) {
@@ -59,7 +59,7 @@ int copy_test() {
     try {
         y = x.deep_copy();
     } 
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;    
     }
     try {
@@ -68,7 +68,7 @@ int copy_test() {
         if (x[0][0][0][0][0] == y[0][0][0][0][0]) 
             throw std::logic_error("");
     }
-    catch (std::logic_error err) {
+    catch (const std::logic_error &err) {
         return 1;
     }/*
     catch (std::exception err) {
@@ -94,7 +94,7 @@ int int_assign_test() {
     try {
         x[0][0] = 5;
     } 
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;
     }
     return 0;
@@ -105,7 +105,7 @@ int invalid_int_assign_test() {
     try {
         x[0] = 5;
     } 
-    catch(std::logic_error err) {
+    catch(const std::logic_error &err) {
         if (std::string("Assignment an integer to an array") == err.what()) return 0;
     }
     return 1;
@@ -120,7 +120,7 @@ int array_assign_test() {
     try {
         x[0] = y;
     } 
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;
     }
     return 0;
@@ -131,7 +131,7 @@ int invalid_array_assign_test() {
     try {
         x[0] = x;
     } 
-    catch(std::logic_error err) {
+    catch(const std::logic_error &err) {
         if (std::string("Assigning arrays of different shape") == err.what()) return 0;
     }
     return 1;
@@ -186,7 +186,7 @@ int index_test() {
     try {
         x[1][2];
     } 
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;
     }
     return 0;
@@ -197,7 +197,7 @@ int negative_index_test(){
     try {
         x[-1][2];
     } 
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;
     }
     return 0;
@@ -208,7 +208,7 @@ int index_out_of_range_test() {
     try {
         x[0][5];
     } 
-    catch(std::out_of_range err) {
+    catch(const std::out_of_range &err) {
         return 0;
     }
     return 1;
@@ -219,7 +219,7 @@ int too_many_indexes_test() {
     try {
         x[0][0][0];
     } 
-    catch(std::logic_error err) {
+    catch(const std::logic_error &err) {
         if(std::string("Array doesn't have that many dimensions") == err.what()) return 0;
     }
     return 1;
@@ -245,7 +245,7 @@ int add_tests() {
         if (9 + x != res2) return 1;
         return 0;
     }
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;
     }
 }
@@ -271,7 +271,7 @@ int sub_tests() {
         if (9 - x != res2) return 1;
         return 0;
     }
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;
     }
 }
@@ -290,7 +290,7 @@ int mult_tests() {
         if (3 * x != res) return 1;
         return 0;
     }
-    catch(std::exception err) {
+    catch(const std::exception &err) {
         return 1;
     }
 }
