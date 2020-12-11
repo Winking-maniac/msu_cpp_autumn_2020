@@ -1,22 +1,18 @@
 COMP = g++
-CFLAGS = -std=c++11 -Wall
-LFLAGS = -lparser
-OBJECTS =
+CFLAGS = -std=c++17 -Wall
+LFLAGS = 
 
 all: test
 
 test: test.out
 	./test.out
 
-test.out: /usr/lib/libparser.so test.o
-	$(COMP) test.o $(CFLAGS) $(LFLAGS) -o $@
+test.out: test.o parser.o
+	$(COMP) $(CFLAGS) $(LFLAGS) $^ -o $@
 
-test.o: test.cpp
-	$(COMP) $(CFLAGS) -c test.cpp -o $@
+%.o: %.cpp
+	$(COMP) $(CFLAGS) -c $< -o $@
 
-/usr/lib/libparser.so: parser.cpp
-	$(COMP) $(CFLAGS) -fPIC parser.cpp -c -o parser.o
-	$(COMP) -shared parser.o -o /usr/lib/libparser.so
-	ldconfig
 clean:
 	rm -rf *.o
+	rm -rf *.out

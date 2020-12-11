@@ -74,14 +74,43 @@ TokenParser :: set_end_callback(VoidCallback f)
 }
 
 void
-TokenParser :: parse(const std::string raw_str)
+TokenParser :: try_callback(VoidCallback f, const char* err_str, const std::string& token)
 {
     try {
-        start_callback();
+        f();
     }
-    catch (std::exception err) {
-        print_error(err, "start_callback");
+    catch (std::exception& err) {
+        print_error(err, err_str, token);
     }
+};
+
+template <typename T>
+void
+TokenParser :: try_callback(std::function<void(T)>& f, T x, const char* err_str, const std::string& token)
+{
+    try {
+        f(x);
+    }
+    catch (std::exception& err) {
+        print_error(err, err_str, token);
+    }
+};
+
+void
+TokenParser :: try_callback(StringCallback f, const std::string& x, const char* err_str, const std::string& token)
+{  
+    try {
+        f(x);
+    }
+    catch (std::exception& err) {
+        print_error(err, err_str, token);
+    }
+};
+
+void
+TokenParser :: parse(const std::string raw_str)
+{
+    try_callback(start_callback, "start_callback");
     std::string str = raw_str + ' ';
     unsigned i = 0, prev = SPACE;
     std::string cur_token = std::string();
@@ -98,57 +127,22 @@ TokenParser :: parse(const std::string raw_str)
                         //std::cout << cur_token[j] << std::endl << isdigit(cur_token[j]) << std::endl;
                     }
                     if (number_callback == N_VOID) {
-                        try {
-                            number_void_callback();
-                        }
-                        catch(std::exception err) {
-                            print_error(err, "number_void_callback", cur_token);
-                        }
+                        try_callback(number_void_callback, "number_void_callback", cur_token);
                     } else if (number_callback == N_INT) {
-                        try {
-                            number_int_callback(number);
-                        }
-                        catch(std::exception err) {
-                            print_error(err, "number_int_callback", cur_token);
-                        }
+                        try_callback(number_int_callback, number, "number_int_callback", cur_token);
                     } else if (number_callback == N_STRING) {
-                        try {
-                            number_string_callback(cur_token);
-                        }
-                        catch(std::exception err) {
-                            print_error(err, "number_string_callback", cur_token);
-                        }
+                        try_callback(StringCallback(number_string_callback), static_cast<const std::string &>(cur_token), "number_string_callback", cur_token);
                     } else if (number_callback == N_CHAR) {
-                        try {
-                            number_char_callback(cur_token.c_str());
-                        }
-                        catch(std::exception err) {
-                            print_error(err, "number_char_callback", cur_token);
-                        }
+                        try_callback(number_char_callback, cur_token.c_str(), "number_char_callback", cur_token);
                     } 
                 }
                 catch(std::invalid_argument) {
                     if (word_callback == W_VOID) {
-                        try {
-                            word_void_callback();
-                        }
-                        catch(std::exception err) {
-                            print_error(err, "word_void_callback", cur_token);
-                        }
+                        try_callback(word_void_callback, "word_void_callback", cur_token);
                     } else if (word_callback == W_STRING) {
-                        try {
-                            word_string_callback(cur_token);
-                        }
-                        catch(std::exception err) {
-                            print_error(err, "word_string_callback", cur_token);
-                        }
+                        try_callback(word_string_callback, static_cast<const std::string &>(cur_token), "number_string_callback", cur_token);
                     } else if (word_callback == W_CHAR) {
-                        try {
-                            word_char_callback(cur_token.c_str());
-                        }
-                        catch(std::exception err) {
-                            print_error(err, "word_char_callback", cur_token);
-                        }
+                        try_callback(word_char_callback, cur_token.c_str(), "word_char_callback", cur_token);
                     }
                 }
                 cur_token = std::string();
@@ -160,14 +154,7 @@ TokenParser :: parse(const std::string raw_str)
         }
         i++;
     }
-     
-    
-    try {
-        end_callback();
-    }
-    catch (std::exception err) {
-        print_error(err, "end_callback");
-    }
+    try_callback(end_callback, "end_callback");
 }
 
 void
@@ -178,7 +165,7 @@ TokenParser :: parse(const char *str)
 }
 
 void
-TokenParser :: print_error(std::exception err, const char* where, std::string cur_token)
+TokenParser :: print_error(std::exception& err, const char* where, const std::string& cur_token)
 {
     std::cout << "In TokenParser: " << where << " exception" << std::endl;
     std::cout << "\t" << err.what() << std::endl;

@@ -4,11 +4,15 @@
 #include <string>
 #include <exception>
 #include <stdexcept>
+#include <functional>
 
-typedef void(*IntCallback)(int);
-typedef void(*CharCallback)(const char *);
-typedef void(*StringCallback)(const std::string);
-typedef void(*VoidCallback)(void);
+using IntCallback = std::function<void(int)>;
+using CharCallback = std::function<void(const char*)>;
+using StringCallback = std::function<void(const std::string &)>;
+using VoidCallback = std::function<void(void)>;
+// typedef void(*CharCallback)(const char *);
+// typedef void(*StringCallback)(const std::string &);
+// typedef void(*VoidCallback)(void);
 
 enum
 {
@@ -44,8 +48,15 @@ class TokenParser
         int number_callback;
         int word_callback;
         
-        void print_error(std::exception err, const char* where, std::string cur_token = std::string());
-    
+        void print_error(std::exception& err, const char* where, const std::string& cur_token = std::string());
+        
+        void try_callback(VoidCallback f, const char* err_str, const std::string& token = std::string());
+        
+        template <class T>
+        void try_callback(std::function<void(T)> &f, T x, const char* err_str, const std::string& token);
+        
+        void try_callback(StringCallback f, const std::string& x, const char* err_str, const std::string& token);
+        
     public:
         TokenParser();       
         ~TokenParser();
