@@ -79,7 +79,7 @@ TokenParser :: try_callback(VoidCallback f, const char* err_str, const std::stri
     try {
         f();
     }
-    catch (std::exception& err) {
+    catch (const std::exception& err) {
         print_error(err, err_str, token);
     }
 };
@@ -91,7 +91,7 @@ TokenParser :: try_callback(std::function<void(T)>& f, T x, const char* err_str,
     try {
         f(x);
     }
-    catch (std::exception& err) {
+    catch (const std::exception& err) {
         print_error(err, err_str, token);
     }
 };
@@ -102,13 +102,13 @@ TokenParser :: try_callback(StringCallback f, const std::string& x, const char* 
     try {
         f(x);
     }
-    catch (std::exception& err) {
+    catch (const std::exception& err) {
         print_error(err, err_str, token);
     }
 };
 
 void
-TokenParser :: parse(const std::string raw_str)
+TokenParser :: parse(const std::string &raw_str)
 {
     try_callback(start_callback, "start_callback");
     std::string str = raw_str + ' ';
@@ -165,7 +165,7 @@ TokenParser :: parse(const char *str)
 }
 
 void
-TokenParser :: print_error(std::exception& err, const char* where, const std::string& cur_token)
+TokenParser :: print_error(const std::exception& err, const char* where, const std::string& cur_token)
 {
     std::cout << "In TokenParser: " << where << " exception" << std::endl;
     std::cout << "\t" << err.what() << std::endl;

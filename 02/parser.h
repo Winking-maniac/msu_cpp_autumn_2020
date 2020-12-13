@@ -48,7 +48,7 @@ class TokenParser
         int number_callback;
         int word_callback;
         
-        void print_error(std::exception& err, const char* where, const std::string& cur_token = std::string());
+        void print_error(const std::exception& err, const char* where, const std::string& cur_token = std::string());
         
         void try_callback(VoidCallback f, const char* err_str, const std::string& token = std::string());
         
@@ -79,7 +79,7 @@ class TokenParser
         
         void set_end_callback(VoidCallback f);
         
-        void parse(const std::string raw_str);
+        void parse(const std::string &raw_str);
         
         void parse(const char *str);
         
