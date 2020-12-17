@@ -53,7 +53,7 @@ args2str(const T &x, const ArgsT&... args) {
 }
 
 template <class... ArgsT>
-std::string &
+std::string
 format(const std::string &format_string, const ArgsT&... args)
 {
     long long i = 0, cur_num = 0, max_num = 0;
@@ -117,15 +117,7 @@ format(const std::string &format_string, const ArgsT&... args)
         i++;
         
     }
-    std::string *res = new std::string(out.str());
-    return *res;
-}
-
-template <class... ArgsT>
-std::string &
-format(const char *format_string, const ArgsT... args)
-{
-    return format(std::string(format_string), args...);
+    return std::string(out.str()); 
 }
 
 int main()
