@@ -4,6 +4,8 @@
 #include <cstring>
 #include <new>
 
+enum { MAX_BASE_POWER = 1000000000 };
+
 // Constructors, destructor
 
 BigInt::BigInt() : size(1), sign(false)
@@ -20,7 +22,7 @@ BigInt::BigInt(int value) : size(1), sign(false)
         value = -value;
         sign = true;
     }
-    if (value > 1000000000) {
+    if (value > MAX_BASE_POWER) {
         integer = static_cast<std::uint32_t*>(malloc(2 * sizeof(*integer)));
     } else {
         integer = static_cast<std::uint32_t*>(malloc(sizeof(*integer)));
@@ -28,15 +30,15 @@ BigInt::BigInt(int value) : size(1), sign(false)
     if(integer == nullptr) {   
         throw std::bad_alloc();
     }
-    integer[0] = value % 1000000000;
-    if (value/1000000000) {
-        integer[1] = value/1000000000;
+    integer[0] = value % MAX_BASE_POWER;
+    if (value/MAX_BASE_POWER) {
+        integer[1] = value/MAX_BASE_POWER;
     }
 }
 
 BigInt::BigInt(const std::string &str_value)
 {
-    *this = std::move(BigInt());
+    *this = BigInt();
     bool tmp_sign = false;
     std::string::const_iterator it = str_value.cbegin();
     if (str_value[0] == '-') {
@@ -104,7 +106,7 @@ BigInt::operator=(BigInt&& x) noexcept
     return *this;
 }
 
-BigInt::~BigInt()
+BigInt::~BigInt() noexcept
 {
     free(integer);
 }
@@ -138,13 +140,13 @@ BigInt::operator+=(const BigInt& x) {
     bool cf = false;
     for (unsigned i = 0; i < x.size; i++) {
         this->integer[i] += x.integer[i] + cf;
-        cf = this->integer[i] / 1000000000;
-        this->integer[i] %= 1000000000;
+        cf = this->integer[i] / MAX_BASE_POWER;
+        this->integer[i] %= MAX_BASE_POWER;
     }
     for (unsigned i = x.size; i < this->size; i++) {
         this->integer[i] += cf;
-        cf = this->integer[i] / 1000000000;
-        this->integer[i] %= 1000000000;
+        cf = this->integer[i] / MAX_BASE_POWER;
+        this->integer[i] %= MAX_BASE_POWER;
     }
     if (cf) {
         this->resize(this->size+1);
@@ -186,18 +188,18 @@ BigInt::operator-=(const BigInt& x)
     if (x.sign != this->sign) {
         return *this += -x;
     }
-    bool this_greater;
+    bool this_greater = false;;
     if (x.size > this->size) {
         this->resize(x.size);
     }
-    for (int i = this->size - 1; i >= x.size; i--) {
+    for (unsigned i = this->size - 1; i >= x.size; i--) {
         if (this->integer[i]) {
             this_greater = true;
             break;
         }
     }
     if (!this_greater) {
-        for (int i = x.size - 1; i >= 0; i--) {
+        for (unsigned i = x.size - 1; i >= 0; i--) {
             if (this->integer[i] > x.integer[i]) {
                 this_greater = true;
                 break;
@@ -212,21 +214,21 @@ BigInt::operator-=(const BigInt& x)
     bool cf = true;
     if (this_greater) {
         for (unsigned i = 0; i < x.size; i++) {
-            this->integer[i] += 1000000000 - x.integer[i] - 1 + cf;
-            cf = this->integer[i] / 1000000000;
-            this->integer[i] %= 1000000000;
+            this->integer[i] += MAX_BASE_POWER - x.integer[i] - 1 + cf;
+            cf = this->integer[i] / MAX_BASE_POWER;
+            this->integer[i] %= MAX_BASE_POWER;
         }
         for (unsigned i = x.size; i < this->size; i++) {
-            this->integer[i] += 1000000000 - 1 + cf;
-            cf = this->integer[i] / 1000000000;
-            this->integer[i] %= 1000000000;
+            this->integer[i] += MAX_BASE_POWER - 1 + cf;
+            cf = this->integer[i] / MAX_BASE_POWER;
+            this->integer[i] %= MAX_BASE_POWER;
         }
     } else {
         this->resize(x.size);
         for (unsigned i = 0; i < this->size; i++) {
-            this->integer[i] = 1000000000 + x.integer[i] - this->integer[i] - 1 + cf;
-            cf = this->integer[i] / 1000000000;
-            this->integer[i] %= 1000000000;
+            this->integer[i] = MAX_BASE_POWER + x.integer[i] - this->integer[i] - 1 + cf;
+            cf = this->integer[i] / MAX_BASE_POWER;
+            this->integer[i] %= MAX_BASE_POWER;
         }
     }
     if (!this_greater) {
@@ -360,6 +362,7 @@ operator<<(std::ostream& out, const BigInt &x)
     for (; i >= 0; i--) {
         out << std::setw(9) << std::setfill('0') << x.integer[i];
     }
+    return out;
 }
 
 void
@@ -400,8 +403,8 @@ BigInt::operator*(std::pair<std::uint32_t, int> x) const
     std::uint64_t tmp = 0;
     for (unsigned i = 0; i < this->size; i++) {
         tmp += this->integer[i] * static_cast<std::uint64_t>(x.first);
-        res.integer[i + x.second] = tmp % 1000000000;
-        tmp /= 1000000000;
+        res.integer[i + x.second] = tmp % MAX_BASE_POWER;
+        tmp /= MAX_BASE_POWER;
     }
     res.integer[x.second + this->size] = tmp;
     res.sign = this->sign; 
