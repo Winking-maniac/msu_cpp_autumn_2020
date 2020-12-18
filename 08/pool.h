@@ -63,7 +63,9 @@ ThreadPool::ThreadPool(size_t poolSize) : size(poolSize)
 
 ThreadPool::~ThreadPool() noexcept
 {
+    mutex.lock();
     terminate = true;
+    mutex.unlock();
     new_task.notify_all();
     for (size_t i =  0; i < size; i++) {
         threads[i].join();

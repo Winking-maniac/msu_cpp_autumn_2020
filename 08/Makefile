@@ -1,5 +1,5 @@
 COMP = g++
-CFLAGS = -std=c++17 -Wall
+CFLAGS = -std=c++11 -Wall
 LFLAGS = -pthread
 OBJECTS = test.o
 
