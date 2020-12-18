@@ -38,7 +38,12 @@ BigInt::BigInt(int value) : size(1), sign(false)
 
 BigInt::BigInt(const std::string &str_value)
 {
-    *this = BigInt();
+    integer = static_cast<std::uint32_t*>(calloc(1, sizeof(*integer)));
+    if(integer == nullptr) {   
+        throw std::bad_alloc();
+    }
+    size = 1;
+    sign = false;
     bool tmp_sign = false;
     std::string::const_iterator it = str_value.cbegin();
     if (str_value[0] == '-') {
@@ -84,8 +89,10 @@ BigInt::BigInt(BigInt&& x) noexcept : integer(x.integer), size(x.size), sign(x.s
 BigInt&
 BigInt::operator=(const BigInt& x)
 {
+    if (x.integer == this->integer) return *this;
     this->size = x.size;
     this->sign = x.sign;
+    free(this->integer);
     this->integer = static_cast<std::uint32_t*>(malloc(this->size * sizeof(*(this->integer))));
     if(this->integer == nullptr) {   
         throw std::bad_alloc();
@@ -97,8 +104,10 @@ BigInt::operator=(const BigInt& x)
 BigInt& 
 BigInt::operator=(BigInt&& x) noexcept
 {
+    if (x.integer == this->integer) return *this;
     this->size = x.size;
     this->sign = x.sign;
+    free(this->integer);
     this->integer = x.integer;
     x.size = 0;
     x.size = false;
@@ -357,7 +366,7 @@ operator<<(std::ostream& out, const BigInt &x)
         out << "-";
     }
     int i = x.size - 1;
-    while (x.integer[i] == 0) i--;
+    while (x.integer[i] == 0 && i >= 0) i--;
     out << x.integer[i--];
     for (; i >= 0; i--) {
         out << std::setw(9) << std::setfill('0') << x.integer[i];
