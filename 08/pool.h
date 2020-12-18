@@ -1,3 +1,6 @@
+#ifndef POOL_H
+#define POOL_H
+
 #include <assert.h>
 #include <functional>
 #include <vector>
@@ -80,3 +83,5 @@ auto ThreadPool::exec(Func func, Args... args) -> std::future<decltype(func(args
     new_task.notify_one();
     return task->get_future();
 }
+
+#endif
