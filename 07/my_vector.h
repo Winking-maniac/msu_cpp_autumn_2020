@@ -105,15 +105,52 @@ template<
             alloc.deallocate(first);
         }
         
-        // My_vector(const My_vector<T> &x);
-        // My_vector(My_vector<T> &&x);
-        // My_vector& operator=(const My_vector<T> &x);
-        // My_vector& operator=(const My_vector<T> &&x);
+        My_vector(const My_vector<T> &x)
+        {
+            alloc = Allocator();
+            first = alloc.allocate(x.end_ - x.first);
+            last = x.last - x.end + first;
+            end_  = first + x.end_ - x.last;
+            T *cur = first;
+            T *cur_x = x.first;
+            while(cur != last) {
+                new (cur++) T(*(cur_x++));
+            }
+        }
+        
+        My_vector(My_vector<T> &&x) : alloc(Allocator()), first(x.first), last(x.last), end_(x.end_)
+        {
+            x.end_ = x.last = x.first = nullptr;
+        }
+        
+        My_vector& operator=(const My_vector<T> &x)
+        {
+            if (x.first == first) return *this;
+            alloc.deallocate(first);
+            first = alloc.allocate(x.end_ - x.first);
+            last = x.last - x.end + first;
+            end_  = first + x.end_ - x.last;
+            T *cur = first;
+            T *cur_x = x.first;
+            while(cur != last) {
+                new (cur++) T(*(cur_x++));
+            }
+        }
+        
+        My_vector& operator=(const My_vector<T> &&x)
+        {
+            if (x.first == first) return *this;
+            alloc.deallocate(first);
+            first = x.first;
+            last = x.last;
+            end_ = x.end_;
+            x.end_ = x.last = x.first = nullptr;
+        }
         
         T& operator[](size_t i)
         {
             if ((first + i) >= last) {
-                throw std::out_of_range("");
+                throw std::out_of_range("Index out of range in My_vector");
             }
             return *(first + i);
         }
@@ -121,7 +158,7 @@ template<
         const T& operator[](size_t i) const
         {
             if ((first + i) >= last) {
-                throw std::out_of_range();
+                throw std::out_of_range("Index out of range in My_vector");
             }
             return static_cast<const T&>(*(first + i));
         }
@@ -210,7 +247,7 @@ template<
             if (last == end_) {
                 reserve(2 * (end_ - first));
             }
-            new (last++) T(args...);
+            new (last++) T(std::forward<Args>(args)...);
         }
         
         My_iterator<T> begin()

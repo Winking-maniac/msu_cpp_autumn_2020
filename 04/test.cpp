@@ -155,6 +155,7 @@ other_tests()
 
 int
 main() {
+    std::cout << BigInt("0");
     std::cout << std::endl;
     int tests_failed = 0;
     tests_failed += construct_tests();
