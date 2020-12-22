@@ -163,10 +163,10 @@ Error Deserializer::process(uint64_t& x) {
     try {
         x = std::stoull(tmp); 
     } 
-    catch (std::invalid_argument) {
+    catch (const std::invalid_argument&) {
         return Error::CorruptedArchive;
     }
-    catch (std::out_of_range) {
+    catch (const std::out_of_range&) {
        return Error::CorruptedArchive;
     }
     return Error::NoError;
