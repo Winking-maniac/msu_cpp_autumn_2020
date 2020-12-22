@@ -13,29 +13,29 @@ enum {
     DELIMITER = ' '
 };
 
-template <class T>
-struct is_bool
-{
-    static constexpr bool value = false;
-};
+// template <class T>
+// struct is_bool
+// {
+    // static constexpr bool value = false;
+// };
         
-template <>
-struct is_bool<bool>
-{
-    static constexpr bool value = true;
-};
+// template <>
+// struct is_bool<bool>
+// {
+    // static constexpr bool value = true;
+// };
 
-template <class T>
-struct is_uint64
-{
-    static constexpr bool value = false;
-};
+// template <class T>
+// struct is_uint64
+// {
+    // static constexpr bool value = false;
+// };
         
-template <>
-struct is_uint64<uint64_t>
-{
-    static constexpr bool value = true;
-};
+// template <>
+// struct is_uint64<uint64_t>
+// {
+    // static constexpr bool value = true;
+// };
 
 
 
@@ -75,18 +75,22 @@ Error Serializer::operator()(ArgsT&&... args)
     return process(std::forward<ArgsT>(args)...);
 }
 
+
+template <>
+Error Serializer::process(bool x) {
+    *out_ << (x ? "true" : "false") << Serializer::Separator;
+    return Error::NoError;
+}
+
+template <>
+Error Serializer::process(uint64_t x) {
+    *out_ << x << Serializer::Separator;
+    return Error::NoError;
+}
+
 template <class T>
 Error Serializer::process(T x) {
-    // std::cout << typeid(x).name();
-    // fflush(stdout);
-    if (is_uint64<T>::value) {
-        // std::cout << x;
-        *out_ << x << Serializer::Separator;
-    } else if (is_bool<T>::value) {
-        // std::cout << x;
-        *out_ << (x ? "true" : "false") << Serializer::Separator;
-    } else return Error::CorruptedArchive;
-    return Error::NoError;
+    return Error::CorruptedArchive;
 }
     
 template <class T, class... ArgsT>
@@ -138,25 +142,41 @@ Error Deserializer::operator()(ArgsT&&... args)
     return process(std::forward<ArgsT>(args)...);
 }
 
-template <class T>
-Error Deserializer::process(T &x) {
+template <>
+Error Deserializer::process(bool& x) {
     std::string tmp;
     *in_ >> tmp;
-    if (is_uint64<T>::value) {
-        try {
-            x = std::stoull(tmp); 
-        } 
-        catch (std::invalid_argument){
-            return Error::CorruptedArchive;
-        }
-    } else if (is_bool<T>::value) {
-        if (std::string("true") == tmp) {
-            x = true;
-        } else if (std::string("false") == tmp) {
-            x = false;
-        } else return Error::CorruptedArchive;
+    
+    if ("true" == tmp) {
+        x = true;
+    } else if ("false" == tmp) {
+        x = false;
     } else return Error::CorruptedArchive;
     return Error::NoError;
+}
+
+template <>
+Error Deserializer::process(uint64_t& x) {
+    std::string tmp;
+    *in_ >> tmp;
+    
+    try {
+        x = std::stoull(tmp); 
+    } 
+    catch (std::invalid_argument) {
+        return Error::CorruptedArchive;
+    }
+    catch (std::out_of_range) {
+       return Error::CorruptedArchive;
+    }
+    return Error::NoError;
+}
+
+
+
+template <class T>
+Error Deserializer::process(T &x) {
+    return Error::CorruptedArchive;
 }
     
 template <class T, class... ArgsT>
