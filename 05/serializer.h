@@ -53,8 +53,8 @@ private:
     std::ostream *out_;
     template <class T>
     Error process(T x);
-    // Error process(bool x);
-    // Error process(uint64_t x);
+    Error process(bool x);
+    Error process(uint64_t x);
     
     template <class T, class... ArgsT>
     Error process(T &&x, ArgsT&&... args);
@@ -76,13 +76,13 @@ Error Serializer::operator()(ArgsT&&... args)
 }
 
 
-template <>
+// template <>
 Error Serializer::process(bool x) {
     *out_ << (x ? "true" : "false") << Serializer::Separator;
     return Error::NoError;
 }
 
-template <>
+// template <>
 Error Serializer::process(uint64_t x) {
     *out_ << x << Serializer::Separator;
     return Error::NoError;
@@ -124,6 +124,8 @@ private:
     
     template <class T, class... ArgsT>
     Error process(T &&x, ArgsT&&... args);
+    Error process(bool& x);
+    Error process(uint64_t& x);
     
     // process использует variadic templates
 };
@@ -142,7 +144,7 @@ Error Deserializer::operator()(ArgsT&&... args)
     return process(std::forward<ArgsT>(args)...);
 }
 
-template <>
+// template <>
 Error Deserializer::process(bool& x) {
     std::string tmp;
     *in_ >> tmp;
@@ -155,7 +157,7 @@ Error Deserializer::process(bool& x) {
     return Error::NoError;
 }
 
-template <>
+// template <>
 Error Deserializer::process(uint64_t& x) {
     std::string tmp;
     *in_ >> tmp;
